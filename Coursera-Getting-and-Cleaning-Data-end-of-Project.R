@@ -1,70 +1,29 @@
-# get data
-# merge training and test sets
-# extract only the mean and std
-# rename activities
-# label variables
-# create a new tidy set
+My ubmission for the peer graded assignment in the course Getting and Cleaning Data Course Project.
 
-## libraries needed for melt and cast
-library(reshape2)
-library(reshape)
 
-## get data
-filename <- "project_data.zip"
+Purpose: 
+The purpose of this project is to demonstrate an ability to collect, work with, and clean a data set.
+The goal is to prepare tidy data that can be used for later analysis.
 
-## download data if it does not exist
-if (!file.exists(filename)){
-  url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
-  download.file(url,filename, method = "curl")
-}
+Project Description:
+One of the most exciting areas in all of data science right now is wearable computing. Companies like Fitbit, Nike, and Jawbone Up are racing to develop the most advanced algorithms to attract new users. The data linked to from the course website represent data collected from the accelerometers from the Samsung Galaxy S smartphone.
 
-## unzip if not unzipped
-if (!file.exists("UCI HAR Dataset")){
-  unzip(filename)
-}
+A full description is available at the site where the data was obtained: http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
 
-## get activity labels
-activity_labels <- read.table("UCI HAR Dataset/activity_labels.txt")
+Location for the data: 
+Here are the data for the project: https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
 
-## get feature labels
-features <- read.table("UCI HAR Dataset/features.txt")
+You should create one R script called run_analysis.R that does the following:
 
-## select features with mean and std (except "meanFreq")
-features_wanted <-intersect(grep(".*mean.*|.*std.*", features[,2]), 
-                            grep(".*meanFreq.*", features[,2], invert = TRUE))
+Merges the training and the test sets to create one data set.
+Extracts only the measurements on the mean and standard deviation for each measurement.
+Uses descriptive activity names to name the activities in the data set.
+Appropriately labels the data set with descriptive variable names.
+From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+Repository Contents:
+My repository contains the following files:
 
-## get names of features
-features_wanted.names <-features[features_wanted,2]
-## swap the "-" for "_"
-features_wanted.names <- gsub('-', '_', features_wanted.names)
-## remove "()"
-features_wanted.names <- gsub('[()]', '', features_wanted.names)
-
-## load train data
-train <- read.table("UCI HAR Dataset/train/X_train.txt")[features_wanted]
-train_activities <- read.table("UCI HAR Dataset/train/Y_train.txt")
-train_subjects <- read.table("UCI HAR Dataset/train/subject_train.txt")
-train <- cbind(train_subjects, train_activities, train)
-
-## load test data
-test <- read.table("UCI HAR Dataset/test/X_test.txt")[features_wanted]
-test_activities <- read.table("UCI HAR Dataset/test/Y_test.txt")
-test_subjects <- read.table("UCI HAR Dataset/test/subject_test.txt")
-test <- cbind(test_subjects, test_activities, test)
-
-## merge rows
-all_data <- rbind(train, test)
-## rename cols
-colnames(all_data) <- c("subject", "activity", features_wanted.names)
-
-# relabel activities and make both activities and subjects as factors
-all_data$activity <- factor(all_data$activity, levels = activity_labels[,1], labels = activity_labels[,2])
-all_data$subject <- as.factor(all_data$subject)
-
-## melt the data
-all_data.melted <- melt(all_data, id = c("subject", "activity"))
-
-## cast into a tidy dataset
-tidy_data <- dcast(all_data.melted, subject + activity ~ variable, mean)
-
-write.table(tidy_data, "tidy_data.txt", row.names = FALSE)
+README.md
+Codebook.md
+run_analysis.R
+Tidy Data.txt
